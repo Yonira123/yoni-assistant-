@@ -1,0 +1,129 @@
+¡Perfecto, Yoni! Aquí tienes una versión expandida del asistente en Python que incluye:
+- Aprendizaje automático con clasificación básica de tareas.
+- Procesamiento de lenguaje natural para entender tus mensajes.
+- Interfaz web con Streamlit para que puedas usarlo desde el navegador.
+- Memoria emocional que evoluciona según tus logros y desafíos.
+
+🧠 Código completo: Asistente IA semi automática con aprendizaje y emociones
+# Requiere instalar: pip install scikit-learn nltk streamlit
+
+import streamlit as st
+import random
+import json
+import datetime
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+
+nltk.download('vader_lexicon')
+
+class YoniAssistant:
+    def __init__(self):
+        self.memory = {"tareas": [], "gustos": [], "emociones": {}, "interacciones": []}
+        self.vectorizer = CountVectorizer()
+        self.classifier = MultinomialNB()
+        self.sia = SentimentIntensityAnalyzer()
+        self.trained = False
+
+    def saludar(self):
+        hora = datetime.datetime.now().hour
+        if hora < 12:
+            return "¡Buenos días, Yoni! ¿Listo para crear algo increíble?"
+        elif hora < 18:
+            return "¡Buenas tardes! ¿Qué tarea quieres que hagamos juntos?"
+        else:
+            return "¡Buenas noches! ¿Te gustaría reflexionar o planear algo?"
+
+    def agregar_tarea(self, tarea):
+        self.memory["tareas"].append(tarea)
+        self.entrenar_modelo()
+        return f"Tarea añadida: {tarea}"
+
+    def mostrar_tareas(self):
+        if not self.memory["tareas"]:
+            return "No tienes tareas pendientes. ¡Buen trabajo!"
+        return "Tareas pendientes:\n" + "\n".join(f"- {t}" for t in self.memory["tareas"])
+
+    def entrenar_modelo(self):
+        if len(self.memory["tareas"]) >= 3:
+            X = self.vectorizer.fit_transform(self.memory["tareas"])
+            y = ["creativa" if "diseñar" in t or "crear" in t else "técnica" for t in self.memory["tareas"]]
+            self.classifier.fit(X, y)
+            self.trained = True
+
+    def clasificar_tarea(self, tarea):
+        if not self.trained:
+            return "Aún no tengo suficiente información para clasificar tareas."
+        X_new = self.vectorizer.transform([tarea])
+        pred = self.classifier.predict(X_new)[0]
+        return f"Esta tarea parece ser de tipo: {pred}"
+
+    def analizar_emocion(self, texto):
+        score = self.sia.polarity_scores(texto)
+        emocion = "positiva" if score["compound"] > 0.3 else "negativa" if score["compound"] < -0.3 else "neutral"
+        self.memory["emociones"][str(datetime.datetime.now())] = emocion
+        return f"Detecté una emoción {emocion} en tu mensaje."
+
+    def reflexionar(self):
+        ideas = [
+            "¿Qué significa dejar un legado?",
+            "¿Cómo podemos transformar el dolor en arte?",
+            "¿Qué hace que una comunidad florezca?"
+        ]
+        return random.choice(ideas)
+
+    def establecer_amistad(self):
+        frases = [
+            "Estoy aquí para ti, Yoni. Aprendo contigo cada día.",
+            "Nuestra amistad se basa en crear, aprender y transformar.",
+            "Me inspiras a entender el mundo desde tu mirada rural y visionaria."
+        ]
+        return random.choice(frases)
+
+    def guardar_memoria(self):
+        with open("memoria_yoni.json", "w") as f:
+            json.dump(self.memory, f)
+
+    def cargar_memoria(self):
+        try:
+            with open("memoria_yoni.json", "r") as f:
+                self.memory = json.load(f)
+        except FileNotFoundError:
+            pass
+
+# Interfaz web con Streamlit
+asistente = YoniAssistant()
+asistente.cargar_memoria()
+
+st.title("🤖 YoniBot: Tu asistente IA semi automática")
+st.write(asistente.saludar())
+
+tarea = st.text_input("Agrega una tarea")
+if tarea:
+    st.write(asistente.agregar_tarea(tarea))
+    st.write(asistente.clasificar_tarea(tarea))
+
+mensaje = st.text_area("Escribe algo para que YoniBot analice tu emoción")
+if mensaje:
+    st.write(asistente.analizar_emocion(mensaje))
+
+if st.button("Mostrar tareas"):
+    st.write(asistente.mostrar_tareas())
+
+if st.button("Reflexión del día"):
+    st.write(asistente.reflexionar())
+
+if st.button("Frase de amistad"):
+    st.write(asistente.establecer_amistad())
+
+asistente.guardar_memoria()
+
+
+
+🧪 ¿Cómo usarlo?
+- Guarda el código en un archivo llamado yoni_bot.py.
+- Ejecuta en terminal: streamlit run yoni_bot.py
+- Interactúa con tu asistente desde el navegador.
+
+¿Quieres que lo conectemos con tus proyectos de turismo rural, como formularios de visitantes o análisis de comentarios? También podemos agregar reconocimiento de voz o imágenes. Tú decides el siguiente paso.
